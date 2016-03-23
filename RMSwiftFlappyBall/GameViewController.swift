@@ -14,8 +14,8 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let scene = GameScene(size:self.view.bounds.size)
-        let skView = self.view as SKView
+        let scene = GameScene(size: self.view.bounds.size)
+        let skView = self.view as! SKView
         
         /* Sprite Kit applies additional optimizations to improve rendering performance */
         skView.ignoresSiblingOrder = true
@@ -30,7 +30,7 @@ class GameViewController: UIViewController {
         return true
     }
 
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.toRaw())
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
 }

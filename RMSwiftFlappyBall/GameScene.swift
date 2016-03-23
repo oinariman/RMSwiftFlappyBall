@@ -8,15 +8,16 @@
 
 import SpriteKit
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene {
+    
     enum Phase {
         case GetReady, Game, GameOver, Medal
     }
     
     // colors
-    let ballColor = UIColor(red:1.0, green:0.26, blue:0.45, alpha:1.0)
+    let ballColor = UIColor(red: 1.0, green: 0.26, blue: 0.45, alpha: 1.0)
     let wallColor = UIColor.cyanColor()
-    let fontColor = UIColor(red:1.0, green:0.26, blue:0.45, alpha:1.0)
+    let fontColor = UIColor(red: 1.0, green: 0.26, blue: 0.45, alpha: 1.0)
     let fontName = "AmericanTypewriter-Bold"
 
     // floor
@@ -30,7 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // wall
     let kWallWidth : CGFloat = 50.0
     let kWallHeightUnit : CGFloat = 480.0 / 13.0
-    let kHoleHeight : UInt32 = 3
+    let kHoleHeight : CGFloat = 3.0
     let kUpperWallHeightMin : UInt32 = 2
     let kUpperWallHeightMax : UInt32 = 8
     let kIntervalBetweenWalls : NSTimeInterval = 1.4
@@ -42,28 +43,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var heightDiff : CGFloat = 0.0
     
     override func didMoveToView(view: SKView) {
-        self.backgroundColor = UIColor.whiteColor()
-        timeForWallGoThroughBall = NSTimeInterval(self.size.width / kWallSpeed * 0.75)
-        heightDiff = (self.size.height - 480.0) * 0.5
+        backgroundColor = UIColor.whiteColor()
+        timeForWallGoThroughBall = NSTimeInterval(size.width / kWallSpeed * 0.75)
+        heightDiff = (size.height - 480.0) * 0.5
         getReady()
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+
         switch phase {
         case .Game:
-            self.childNodeWithName("🐦").physicsBody.velocity.dy = kFlappingVelocityY
+            if let physicsBody = childNodeWithName("🐦")?.physicsBody {
+                physicsBody.velocity.dy = kFlappingVelocityY
+            }
+            
         case .Medal:
-            if self.childNodeWithName("cover") == nil {
+            if childNodeWithName("cover") == nil {
                 goBackToGetReady()
             }
+            
         case .GetReady:
             startGame()
+            
         default:
-            println("🍣")
+            print("🍣")
+            
         }
     }
     
-    // MARK: Phase
+    // MARK: - Phase
     
     /**
      * Moves to "Get Ready" phase.
@@ -71,15 +79,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func getReady()
     {
         putBall()
-        let 🐦 = childNodeWithName("🐦")
-        🐦.physicsBody.affectedByGravity = false
-        let up = SKAction.moveBy(CGVectorMake(0.0, self.kBallWidth), duration: 0.4)
-        up.timingMode = .EaseOut
-        let down = SKAction.moveBy(CGVectorMake(0.0, -self.kBallWidth), duration: 0.35)
-        down.timingMode = .EaseIn
-        let sequence = SKAction.sequence([up, down])
-        let action = SKAction.repeatActionForever(sequence)
-        🐦.runAction(action)
+        if let 🐦 = childNodeWithName("🐦") {
+            🐦.physicsBody?.affectedByGravity = false
+            
+            
+            let up = SKAction.moveBy(CGVectorMake(0.0, kBallWidth), duration: 0.4)
+            up.timingMode = .EaseOut
+            let down = SKAction.moveBy(CGVectorMake(0.0, -kBallWidth), duration: 0.35)
+            down.timingMode = .EaseIn
+            🐦.runAction(SKAction.repeatActionForever(SKAction.sequence([up, down])))
+        }
         
         putFloor()
         
@@ -91,10 +100,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func gameOver()
     {
-        self.removeAllActions()
-        for node : AnyObject in self.children {
-            node.removeAllActions()
-        }
+        removeAllActions()
+        children.forEach { $0.removeAllActions() }
         putGameOverLabel()
         phase = Phase.GameOver
     }
@@ -105,10 +112,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func startGame()
     {
         phase = Phase.Game
-        self.childNodeWithName("🐦")?.removeFromParent()
+        childNodeWithName("🐦")?.removeFromParent()
         
-        self.physicsWorld.gravity = CGVectorMake(0.0, kGravity)
-        self.physicsWorld.contactDelegate = self
+        physicsWorld.gravity = CGVectorMake(0.0, kGravity)
+        physicsWorld.contactDelegate = self
         
         putBall()
         putWallsPeriodically()
@@ -122,37 +129,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func goBackToGetReady()
     {
-        let children = self.children
-        let cover = SKSpriteNode(color: UIColor.blackColor(), size:self.size)
+        let cover = SKSpriteNode(color: UIColor.blackColor(), size: size)
         cover.alpha = 0.0
         cover.name = "cover"
-        cover.position = CGPointMake(self.size.width/2.0, self.size.height/2.0)
+        cover.position = CGPointMake(size.width/2.0, size.height/2.0)
         cover.zPosition = 100000
-        self.addChild(cover)
+        addChild(cover)
         
         cover.runAction(SKAction.sequence([
             SKAction.fadeInWithDuration(0.3),
             SKAction.runBlock({
-                self.removeChildrenInArray(children)
+                self.removeChildrenInArray(self.children)
                 self.getReady() }),
             SKAction.fadeOutWithDuration(0.3),
             SKAction.removeFromParent()
             ]))
     }
     
-    // MARK: 1. Ball
+    // MARK: - 1. Ball
     
     func ballImage(size: CGSize, color: UIColor) ->UIImage
     {
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.mainScreen().scale)
         let context = UIGraphicsGetCurrentContext()
-        CGContextSetLineWidth(context, 2.0)
         CGContextSetFillColorWithColor(context, color.CGColor)
-        
-        var s = size
-        s.width -= 1.0
-        s.height -= 1.0
-        CGContextFillEllipseInRect(context, CGRect(origin:CGPointMake(0.5, 0.5), size:s))
+        CGContextFillEllipseInRect(context, CGRectMake(0.5, 0.5, size.width - 1.0, size.height - 1.0))
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
@@ -160,35 +161,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func putBall()
     {
-        let 🐦 = SKSpriteNode(texture:
-            SKTexture(image:ballImage(CGSizeMake(kBallWidth, kBallWidth), color:ballColor)))
-        🐦.position = CGPointMake(self.size.width / 4.0, self.size.height / 2.0)
-        🐦.hidden = false
+        let 🐦 = SKSpriteNode(texture: SKTexture(image: ballImage(CGSizeMake(kBallWidth, kBallWidth), color: ballColor)))
+        🐦.position = CGPointMake(size.width / 4.0, size.height / 2.0)
         🐦.name = "🐦"
         
-        let body = SKPhysicsBody(circleOfRadius:kBallWidth / 2.0)
+        let body = SKPhysicsBody(circleOfRadius: kBallWidth / 2.0)
         🐦.physicsBody = body
         
-        self.addChild(🐦)
+        addChild(🐦)
     }
     
-    // MARK: 2. Floor
+    // MARK: - 2. Floor
     
-    func floorImageWithSize(size: CGSize) ->UIImage
+    func floorImageWithSize(size: CGSize) -> UIImage
     {
         UIGraphicsBeginImageContextWithOptions(size, true, UIScreen.mainScreen().scale)
         let context = UIGraphicsGetCurrentContext()
         CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 1.0)
-        let dashes = [16.0, 16.0]
-        CGContextSetRGBFillColor(context, 0.8, 0.8, 0.8, 1.0);
-        CGContextFillRect(context, CGRect(origin:CGPointZero, size:size))
+        CGContextSetRGBFillColor(context, 0.8, 0.8, 0.8, 1.0)
+        CGContextFillRect(context, CGRect(origin: CGPointZero, size: size))
         
-        CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1.0);
-        CGContextSetLineDash(context, 0, [16.0, 16.0], 2);
-        CGContextSetLineWidth(context, 2.0);
-        for var i:CGFloat = 0; i < 3; i++ {
-            CGContextMoveToPoint(context, 0.0, i * 2.0)
-            CGContextAddLineToPoint(context, size.width, i * 2.0);
+        CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1.0)
+        CGContextSetLineDash(context, 0, [16.0, 16.0], 2)
+        CGContextSetLineWidth(context, 2.0)
+        for i in 0..<3 {
+            CGContextMoveToPoint(context, 0.0, CGFloat(i) * 2.0)
+            CGContextAddLineToPoint(context, size.width, CGFloat(i) * 2.0)
         }
         CGContextStrokePath(context);
         let image = UIGraphicsGetImageFromCurrentImageContext()
@@ -201,15 +199,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func putFloor()
     {
-        let size = CGSizeMake(self.size.width * 2.0, kFloorHeight + heightDiff)
+        let floorSize = CGSizeMake(size.width * 2.0, kFloorHeight + heightDiff)
         
-        let floor = SKSpriteNode(texture:SKTexture(image:floorImageWithSize(size)))
-        floor.size = size
-        floor.position = CGPointMake(self.size.width, size.height * 0.5)
+        let floor = SKSpriteNode(texture:SKTexture(image:floorImageWithSize(floorSize)))
+        floor.size = floorSize
+        floor.position = CGPointMake(size.width, floorSize.height * 0.5)
         floor.name = "floor"
         floor.zPosition = 4000
         
-        let body = SKPhysicsBody(rectangleOfSize:size)
+        let body = SKPhysicsBody(rectangleOfSize:floorSize)
         body.affectedByGravity = false
         body.dynamic = false
         body.contactTestBitMask = 1
@@ -217,15 +215,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         floor.physicsBody = body
         
         let sequence = SKAction.sequence([
-            SKAction.moveToX(0.0, duration:NSTimeInterval(self.size.width / kWallSpeed)),
-            SKAction.moveToX(self.size.width, duration:0.0)])
+            SKAction.moveToX(0.0, duration:NSTimeInterval(size.width / kWallSpeed)),
+            SKAction.moveToX(size.width, duration:0.0)])
         let action = SKAction.repeatActionForever(sequence)
         floor.runAction(action)
         
-        self.addChild(floor)
+        addChild(floor)
     }
     
-    // MARK: 3. Wall
+    // MARK: - 3. Wall
     
     /**
     *  Puts wall.
@@ -235,10 +233,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func putWallWithHeight(height: CGFloat, y:CGFloat)
     {
-        let wall = SKSpriteNode(color:wallColor, size:CGSizeMake(kWallWidth, height))
-        wall.position = CGPointMake(self.size.width + kWallWidth / 2.0, y)
+        let wall = SKSpriteNode(color: wallColor, size: CGSizeMake(kWallWidth, height))
+        wall.position = CGPointMake(size.width + kWallWidth / 2.0, y)
 
-        let body = SKPhysicsBody(rectangleOfSize:wall.size)
+        let body = SKPhysicsBody(rectangleOfSize: wall.size)
         body.affectedByGravity = false
         body.dynamic = false
         body.contactTestBitMask = 1
@@ -246,10 +244,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         wall.runAction(
             SKAction.sequence([
-                SKAction.moveToX(-kWallWidth, duration:NSTimeInterval((self.size.width + kWallWidth) / kWallSpeed)),
+                SKAction.moveToX(-kWallWidth, duration: NSTimeInterval((size.width + kWallWidth) / kWallSpeed)),
                 SKAction.removeFromParent()]))
         
-        self.addChild(wall)
+        addChild(wall)
     }
     
     /**
@@ -257,11 +255,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func putWalls()
     {
-        let upperWallHeight : CGFloat =
-        kWallHeightUnit * CGFloat(arc4random() % (kUpperWallHeightMax - kUpperWallHeightMin) + kUpperWallHeightMin) + heightDiff
-        let bottomWallHeight = self.size.height - upperWallHeight - kWallHeightUnit * CGFloat(kHoleHeight)
+        let upperWallHeight = kWallHeightUnit * CGFloat(arc4random() % (kUpperWallHeightMax - kUpperWallHeightMin) + kUpperWallHeightMin) + heightDiff
+        let bottomWallHeight = size.height - upperWallHeight - kWallHeightUnit * CGFloat(kHoleHeight)
         
-        putWallWithHeight(upperWallHeight, y: self.size.height - upperWallHeight / 2.0)
+        putWallWithHeight(upperWallHeight, y: size.height - upperWallHeight / 2.0)
         putWallWithHeight(bottomWallHeight, y: bottomWallHeight / 2.0)
     }
 
@@ -273,28 +270,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let pointAction = SKAction.sequence([
             SKAction.waitForDuration(timeForWallGoThroughBall),
             SKAction.runBlock({
-                let 🐦 = self.childNodeWithName("🐦")
+                guard let 🐦 = self.childNodeWithName("🐦") else {
+                    return
+                }
                 if 🐦.position.y > self.size.height {
                     self.gameOver()
-                }
-                else {
+                } else {
                     self.incrementPoints()
                 }
-                })
+            })
             ])
         
-        self.runAction(
+        runAction(
             SKAction.repeatActionForever(
                 SKAction.sequence([
                     SKAction.waitForDuration(kIntervalBetweenWalls),
                     SKAction.runBlock({
                         self.putWalls()
                         self.runAction(pointAction)
-                        })])
+                    })])
             ))
     }
     
-    // MARK: 4. Points
+    // MARK: - 4. Points
 
     /**
     *  Puts the points label.
@@ -306,9 +304,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         label.fontSize = 36.0
         label.fontColor = fontColor
         label.text = "0"
-        label.position = CGPointMake(self.size.width / 2.0, self.size.height * 0.75)
+        label.position = CGPointMake(size.width / 2.0, size.height * 0.75)
         label.zPosition = 5000
-        self.addChild(label)
+        addChild(label)
     }
     
     /**
@@ -316,11 +314,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     */
     func incrementPoints()
     {
-        let label = self.childNodeWithName("points") as SKLabelNode
+        let label = childNodeWithName("points") as! SKLabelNode
         label.text = String(++points)
     }
     
-    // MARK: 5. Game Over
+    // MARK: - 5. Game Over
     
     /**
     *  Puts the game over label.
@@ -331,27 +329,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         label.fontColor = fontColor
         label.text = "Game Over"
         label.zPosition = 5000
-        label.position = CGPointMake(self.size.width/2, self.size.height-36.0)
+        label.position = CGPointMake(size.width/2, size.height-36.0)
 
-        let moveToAction = SKAction.moveToY(self.size.height/2.0, duration: 0.1)
+        let moveToAction = SKAction.moveToY(size.height/2.0, duration: 0.1)
         let blockAction = SKAction.runBlock({ self.phase = Phase.Medal })
         label.runAction(SKAction.sequence([moveToAction, blockAction]))
         
-        self.addChild(label)
+        addChild(label)
     }
+    
+}
 
-    // MARK: SKPhysicsContactDelegate methods
+// MARK: - SKPhysicsContactDelegate methods
+
+extension GameScene : SKPhysicsContactDelegate {
     
     /**
-    *  Moves to game over phase when the ball contacts with any other objects.
-    *
-    *  @param contact an object that describes the contact.
-    */
-    func didBeginContact(contact: SKPhysicsContact!)
+     *  Moves to game over phase when the ball contacts with any other objects.
+     *
+     *  @param contact an object that describes the contact.
+     */
+    func didBeginContact(contact: SKPhysicsContact)
     {
         if phase == Phase.Game {
             gameOver()
         }
     }
+    
 }
-
