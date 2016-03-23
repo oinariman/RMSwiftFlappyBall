@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		DDE9A7791CA1BA7B003454CF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DDE9A7771CA1BA7B003454CF /* Launch Screen.storyboard */; };
+		DDE9A77E1CA231F2003454CF /* flap.caf in Resources */ = {isa = PBXBuildFile; fileRef = DDE9A77B1CA231F2003454CF /* flap.caf */; };
+		DDE9A77F1CA231F2003454CF /* hit.caf in Resources */ = {isa = PBXBuildFile; fileRef = DDE9A77C1CA231F2003454CF /* hit.caf */; };
+		DDE9A7801CA231F2003454CF /* score.caf in Resources */ = {isa = PBXBuildFile; fileRef = DDE9A77D1CA231F2003454CF /* score.caf */; };
 		E270E9DA193E22B1001733D0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270E9D9193E22B1001733D0 /* AppDelegate.swift */; };
 		E270E9DE193E22B1001733D0 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270E9DD193E22B1001733D0 /* GameScene.swift */; };
 		E270E9E0193E22B1001733D0 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270E9DF193E22B1001733D0 /* GameViewController.swift */; };
@@ -28,6 +31,9 @@
 
 /* Begin PBXFileReference section */
 		DDE9A7781CA1BA7B003454CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "Base.lproj/Launch Screen.storyboard"; sourceTree = "<group>"; };
+		DDE9A77B1CA231F2003454CF /* flap.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = flap.caf; sourceTree = "<group>"; };
+		DDE9A77C1CA231F2003454CF /* hit.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = hit.caf; sourceTree = "<group>"; };
+		DDE9A77D1CA231F2003454CF /* score.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = score.caf; sourceTree = "<group>"; };
 		E270E9D4193E22B1001733D0 /* RMSwiftFlappyBall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RMSwiftFlappyBall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E270E9D8193E22B1001733D0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E270E9D9193E22B1001733D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -58,6 +64,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DDE9A77A1CA231F2003454CF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DDE9A77B1CA231F2003454CF /* flap.caf */,
+				DDE9A77C1CA231F2003454CF /* hit.caf */,
+				DDE9A77D1CA231F2003454CF /* score.caf */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		E270E9CB193E22B0001733D0 = {
 			isa = PBXGroup;
 			children = (
@@ -85,6 +101,7 @@
 				E270E9E1193E22B1001733D0 /* Main.storyboard */,
 				DDE9A7771CA1BA7B003454CF /* Launch Screen.storyboard */,
 				E270E9E4193E22B1001733D0 /* Images.xcassets */,
+				DDE9A77A1CA231F2003454CF /* Resources */,
 				E270E9D7193E22B1001733D0 /* Supporting Files */,
 			);
 			path = RMSwiftFlappyBall;
@@ -198,8 +215,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				DDE9A7791CA1BA7B003454CF /* Launch Screen.storyboard in Resources */,
+				DDE9A7801CA231F2003454CF /* score.caf in Resources */,
 				E270E9E5193E22B1001733D0 /* Images.xcassets in Resources */,
 				E270E9E3193E22B1001733D0 /* Main.storyboard in Resources */,
+				DDE9A77F1CA231F2003454CF /* hit.caf in Resources */,
+				DDE9A77E1CA231F2003454CF /* flap.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

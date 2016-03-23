@@ -49,13 +49,19 @@ class GameScene: SKScene {
         getReady()
     }
     
+    func flap() {
+        if let physicsBody = childNodeWithName("🐦")?.physicsBody {
+            runAction(SKAction.playSoundFileNamed("flap.caf", waitForCompletion: false))
+            physicsBody.velocity.dy = kFlappingVelocityY
+        }
+        
+    }
+    
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
 
         switch phase {
         case .Game:
-            if let physicsBody = childNodeWithName("🐦")?.physicsBody {
-                physicsBody.velocity.dy = kFlappingVelocityY
-            }
+            flap()
             
         case .Medal:
             if childNodeWithName("cover") == nil {
@@ -64,6 +70,7 @@ class GameScene: SKScene {
             
         case .GetReady:
             startGame()
+            flap()
             
         default:
             print("🍣")
@@ -275,6 +282,7 @@ class GameScene: SKScene {
                 }
                 if 🐦.position.y > self.size.height {
                     self.gameOver()
+                    self.runAction(SKAction.playSoundFileNamed("hit.caf", waitForCompletion: false))
                 } else {
                     self.incrementPoints()
                 }
@@ -286,6 +294,9 @@ class GameScene: SKScene {
                 SKAction.sequence([
                     SKAction.waitForDuration(kIntervalBetweenWalls),
                     SKAction.runBlock({
+                        guard self.phase == .Game else {
+                            return
+                        }
                         self.putWalls()
                         self.runAction(pointAction)
                     })])
@@ -314,6 +325,8 @@ class GameScene: SKScene {
     */
     func incrementPoints()
     {
+        runAction(SKAction.playSoundFileNamed("score.caf", waitForCompletion: false))
+        
         let label = childNodeWithName("points") as! SKLabelNode
         label.text = String(++points)
     }
@@ -354,6 +367,7 @@ extension GameScene : SKPhysicsContactDelegate {
         if phase == Phase.Game {
             gameOver()
         }
+        runAction(SKAction.playSoundFileNamed("hit.caf", waitForCompletion: false))
     }
     
 }
