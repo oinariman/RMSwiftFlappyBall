@@ -155,20 +155,13 @@ class GameScene: SKScene {
     
     // MARK: - 1. Ball
     
-    func ballImage(size: CGSize, color: UIColor) ->UIImage
-    {
-        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.mainScreen().scale)
-        let context = UIGraphicsGetCurrentContext()
-        CGContextSetFillColorWithColor(context, color.CGColor)
-        CGContextFillEllipseInRect(context, CGRectMake(0.5, 0.5, size.width - 1.0, size.height - 1.0))
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image
-    }
-    
     func putBall()
     {
-        let 🐦 = SKSpriteNode(texture: SKTexture(image: ballImage(CGSizeMake(kBallWidth, kBallWidth), color: ballColor)))
+        let 🐦 = SKLabelNode(text: "🐦")
+        🐦.fontSize = 36.0
+        🐦.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
+        🐦.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Center
+        🐦.xScale = -1.0
         🐦.position = CGPointMake(size.width / 4.0, size.height / 2.0)
         🐦.name = "🐦"
         
